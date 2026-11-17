@@ -1,45 +1,362 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>COMPAMED Bulk Company Data Extractor</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COMPAMED Company Data Extractor</title>
+
 <style>
-:root{--bg:#0b1220;--panel:#111c30;--line:#263650;--muted:#9aabc4;--text:#f4f7fb;--blue:#4f8cff;--green:#31c48d}
-*{box-sizing:border-box}body{margin:0;background:linear-gradient(135deg,#0b1220,#101d34);font-family:Inter,system-ui,Arial,sans-serif;color:var(--text);min-height:100vh}
-.wrap{max-width:1160px;margin:auto;padding:30px 18px 55px}.top{display:flex;align-items:center;gap:12px;margin-bottom:22px}.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#3978f6,#29c5a2);display:grid;place-items:center;font-weight:900;font-size:18px}
-h1{font-size:clamp(24px,4vw,35px);margin:0}.sub{color:var(--muted);margin:6px 0 0}.layout{display:grid;grid-template-columns:1fr 1.08fr;gap:17px}.card{background:rgba(17,28,48,.96);border:1px solid var(--line);border-radius:18px;padding:21px;box-shadow:0 16px 45px #0002}h2{font-size:18px;margin:0 0 12px}.hint{font-size:13px;color:var(--muted);line-height:1.5}
-textarea{width:100%;height:255px;resize:vertical;background:#091323;border:1px solid #2b3d59;border-radius:12px;color:#eaf1ff;padding:13px;font:13px/1.6 ui-monospace,monospace;outline:none}textarea:focus,input:focus{border-color:var(--blue)}
-.optionbox{background:#0b1628;border:1px solid #263650;border-radius:12px;padding:13px;margin:12px 0}.option-title{font-size:13px;font-weight:700;margin-bottom:8px}.radios{display:flex;gap:18px;flex-wrap:wrap}.radios label{display:flex;align-items:center;gap:7px;color:#dce7f7;font-size:13px;cursor:pointer}.radios input{accent-color:#4f8cff}.field{margin-top:10px}.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}.field input{width:100%;background:#091323;border:1px solid #2b3d59;color:#eaf1ff;border-radius:9px;padding:11px;outline:none}.actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:13px}.btn{border:0;border-radius:10px;padding:11px 15px;font-weight:750;cursor:pointer;background:var(--blue);color:white}.btn.secondary{background:#263650;color:#e7efff}.btn.green{background:#168a68}.btn:disabled{opacity:.45;cursor:not-allowed}.status{margin-top:13px;color:var(--muted);font-size:13px}.bar{height:8px;background:#263650;border-radius:20px;overflow:hidden;margin-top:9px}.fill{height:100%;width:0;background:linear-gradient(90deg,#4f8cff,#31c48d);transition:width .2s}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:13px 0}.stat{background:#0b1628;border:1px solid #263650;border-radius:12px;padding:12px}.stat b{font-size:22px;display:block}.stat span{font-size:12px;color:var(--muted)}
-.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:12px;margin-top:14px}table{width:100%;border-collapse:collapse;min-width:620px;font-size:13px}th,td{text-align:left;padding:10px 11px;border-bottom:1px solid #263650;vertical-align:top}th{background:#0b1628;color:#a9bbd5;position:sticky;top:0}td{color:#e5edfa}td a{color:#8bb4ff;text-decoration:none}.pill{font-size:11px;padding:4px 8px;border-radius:30px;background:#173d34;color:#6ee7b7}.pill.bad{background:#41282a;color:#ffaaaa}.note{color:#a9bbd5;font-size:11px;max-width:230px}.footer{color:#8192aa;font-size:12px;margin-top:16px;line-height:1.6}.hidden{display:none!important}
-@media(max-width:850px){.layout{grid-template-columns:1fr}.wrap{padding:20px 13px}.card{padding:16px}textarea{height:220px}}
-</style></head><body><main class="wrap">
-<header class="top"><div class="logo">CX</div><div><h1>Company Data Extractor</h1><p class="sub">Bulk website & email finder for COMPAMED exhibitor profiles</p></div></header>
-<div class="layout"><section class="card"><h2>1. Paste profile links</h2><p class="hint">One profile URL per line. Maximum 100 links per batch. Duplicate links are removed automatically.</p>
-<textarea id="urls" placeholder="Paste COMPAMED profile links here, one per line..."></textarea>
-<div class="optionbox"><div class="option-title">After opening each profile, click one more button?</div><div class="radios">
-<label><input type="radio" name="clickExtra" value="yes"> Yes</label><label><input type="radio" name="clickExtra" value="no"> No</label>
-</div><p class="hint">Optional — leave both unselected if you do not need an extra click. The extractor will still open the built-in Company Data section.</p>
-<div class="field"><label for="buttonName">Button name to click (optional)</label><input id="buttonName" type="text" maxlength="120" placeholder="Example: Contact details, More information, Details"></div></div>
-<div class="actions"><button class="btn" id="start">Extract Company Data</button><button class="btn secondary" id="clear">Clear</button></div><div class="status" id="status">Ready. Paste profile links to begin.</div><div class="bar"><div class="fill" id="fill"></div></div>
-<p class="footer">The optional button setting applies to every profile in this batch. If enabled, enter the exact visible button/tab name. Keep this page open while extraction runs.</p></section>
-<section class="card"><h2>2. Results & export</h2><p class="hint">Copy Website + Email directly into Excel, or download CSV with status and profile link.</p>
-<div class="stats"><div class="stat"><b id="total">0</b><span>Processed</span></div><div class="stat"><b id="found">0</b><span>Found</span></div><div class="stat"><b id="missing">0</b><span>Not found / error</span></div></div>
-<div class="actions"><button class="btn green" id="copy" disabled>Copy All for Excel</button><button class="btn secondary" id="download" disabled>Download CSV</button></div>
-<div class="tablewrap"><table><thead><tr><th>Website</th><th>Email</th><th>Status</th><th>Note</th></tr></thead><tbody id="rows"><tr><td colspan="4" class="hint">No results yet.</td></tr></tbody></table></div>
-<p class="footer">Only values found in the visible Company Data/popup content are used. COMPAMED platform links and social links are excluded. Missing fields stay blank.</p></section></div>
-<p class="footer">COMPAMED Bulk Company Data Extractor · Hosted frontend + Render browser automation backend.</p></main>
+*{box-sizing:border-box}
+body{
+    margin:0;padding:28px;
+    font-family:Arial,sans-serif;
+    color:#f8fafc;
+    background:#0b1120;
+}
+.container{max-width:1250px;margin:auto}
+header{margin-bottom:25px}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{
+    width:50px;height:50px;border-radius:14px;
+    display:grid;place-items:center;
+    font-weight:bold;font-size:19px;
+    background:linear-gradient(135deg,#22d3ee,#6366f1);
+}
+h1{margin:0;font-size:30px}
+.subtitle{color:#a5b4c8;margin-top:7px}
+.layout{
+    display:grid;
+    grid-template-columns:1fr 1.25fr;
+    gap:20px;
+}
+.card{
+    background:#111c30;
+    border:1px solid #27364d;
+    border-radius:18px;
+    padding:22px;
+    min-width:0;
+}
+h2{font-size:19px;margin:0 0 14px}
+.description,.hint,.footer{color:#a5b4c8;font-size:13px;line-height:1.6}
+textarea,input{
+    width:100%;padding:14px;
+    color:#f8fafc;background:#0b1425;
+    border:1px solid #34445d;
+    border-radius:10px;outline:none;
+    font:14px Arial;
+}
+textarea{height:220px;resize:vertical;line-height:1.6}
+input:focus,textarea:focus{border-color:#38bdf8}
+.options{
+    margin-top:15px;padding:15px;
+    border:1px solid #34445d;border-radius:12px;
+}
+.option-title{font-weight:bold;margin-bottom:12px}
+.radio-row{display:flex;gap:22px;align-items:center}
+.radio-row label{display:flex;align-items:center;gap:7px}
+.radio-row input{width:auto}
+.field-label{display:block;font-size:13px;margin:15px 0 8px;color:#cbd5e1}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+button{
+    padding:12px 18px;border:0;border-radius:10px;
+    cursor:pointer;font-weight:bold;font-size:14px;
+}
+.primary{background:#38bdf8;color:#062033}
+.secondary{background:#334155;color:white}
+.green{background:#22c55e;color:#052e16}
+button:disabled{opacity:.45;cursor:not-allowed}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0}
+.stat{
+    padding:15px;background:#0b1425;
+    border:1px solid #293b55;border-radius:12px;
+}
+.stat b{display:block;font-size:27px;margin-bottom:5px}
+.stat span{font-size:12px;color:#a5b4c8}
+.table-wrap{overflow:auto;margin-top:15px}
+table{width:100%;border-collapse:collapse;min-width:550px}
+th,td{
+    padding:13px 10px;text-align:left;
+    border-bottom:1px solid #293b55;
+    font-size:13px;vertical-align:top;
+}
+th{color:#a5b4c8}
+td a{color:#7dd3fc;overflow-wrap:anywhere}
+.status{color:#86efac}
+.error{color:#fca5a5}
+.progress{
+    height:8px;background:#26364e;
+    border-radius:20px;overflow:hidden;margin-top:12px;
+}
+.progress-bar{
+    height:100%;width:0%;
+    background:linear-gradient(90deg,#38bdf8,#22c55e);
+    transition:width .2s;
+}
+.footer{margin-top:22px}
+@media(max-width:850px){
+    body{padding:15px}
+    .layout{grid-template-columns:1fr}
+    h1{font-size:24px}
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<header>
+    <div class="brand">
+        <div class="logo">CX</div>
+        <div>
+            <h1>Company Data Extractor</h1>
+            <div class="subtitle">Bulk website & email finder for COMPAMED exhibitor profiles</div>
+        </div>
+    </div>
+</header>
+
+<div class="layout">
+
+<section class="card">
+    <h2>1. Paste profile links</h2>
+    <p class="description">
+        One profile URL per line. Maximum 100 links per batch.
+        Duplicate links are removed automatically.
+    </p>
+
+    <textarea id="urls" placeholder="Paste COMPAMED profile links here, one per line..."></textarea>
+
+    <div class="options">
+        <div class="option-title">After opening each profile, click one more button?</div>
+
+        <div class="radio-row">
+            <label><input type="radio" name="clickExtra" value="yes"> Yes</label>
+            <label><input type="radio" name="clickExtra" value="no"> No</label>
+        </div>
+
+        <p class="hint">
+            Optional — leave both unselected if you do not need an extra click.
+            The extractor will still open the built-in Company Data section.
+        </p>
+
+        <label class="field-label" for="buttonName">Button name to click (optional)</label>
+        <input id="buttonName" type="text" placeholder="Example: Contact details, More information, Details">
+    </div>
+
+    <div class="actions">
+        <button class="primary" id="start">Extract Company Data</button>
+        <button class="secondary" id="clear">Clear</button>
+    </div>
+
+    <p id="status" class="description">Ready. Paste profile links to begin.</p>
+
+    <div class="progress">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <p class="hint">
+        The optional button setting applies to every profile in this batch.
+        Keep this page open while extraction runs.
+    </p>
+</section>
+
+<section class="card">
+    <h2>2. Results & export</h2>
+    <p class="description">Copy Website + Email directly into Excel, or download the result as CSV.</p>
+
+    <div class="stats">
+        <div class="stat"><b id="total">0</b><span>Processed</span></div>
+        <div class="stat"><b id="found">0</b><span>Found</span></div>
+        <div class="stat"><b id="notFound">0</b><span>Not found / error</span></div>
+    </div>
+
+    <div class="actions">
+        <button class="green" id="copy" disabled>Copy All for Excel</button>
+        <button class="secondary" id="download" disabled>Download CSV</button>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Website</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="rows">
+                <tr><td colspan="3">No results yet.</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <p class="footer">
+        Only values found in the visible Company Data/popup content are used.
+        Missing fields stay blank. Social media and COMPAMED links are excluded.
+    </p>
+</section>
+
+</div>
+
+<p class="footer">
+    COMPAMED Bulk Company Data Extractor · Powered by Playwright and FastAPI.
+</p>
+
+</div>
+
 <script>
-const API_BASE='https://data-ext.onrender.com';const $=id=>document.getElementById(id);let results=[];
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function csvEscape(v){return '"'+String(v??'').replace(/"/g,'""')+'"'}
-function tsv(){return ['Website\tEmail',...results.map(r=>(r.website||'')+'\t'+(r.email||''))].join('\r\n')}
-function render(){ $('total').textContent=results.length;$('found').textContent=results.filter(x=>x.status==='Found').length;$('missing').textContent=results.filter(x=>x.status!=='Found').length;
- $('rows').innerHTML=results.length?results.map(r=>`<tr><td>${r.website?`<a href="${esc(r.website)}" target="_blank" rel="noopener">${esc(r.website)}</a>`:'—'}</td><td>${esc(r.email||'—')}</td><td><span class="pill ${r.status==='Found'?'':'bad'}">${esc(r.status)}</span></td><td class="note">${esc(r.note||'')}</td></tr>`).join(''):'<tr><td colspan="4" class="hint">No results yet.</td></tr>';
- $('copy').disabled=!results.length;$('download').disabled=!results.length; }
-$('start').onclick=async()=>{const urls=[...new Set($('urls').value.split(/\r?\n/).map(x=>x.trim()).filter(Boolean))];if(!urls.length){$('status').textContent='Paste at least one profile link.';return}if(urls.length>100){$('status').textContent=`You pasted ${urls.length} unique links. Maximum is 100 per batch.`;return}
- const choice=document.querySelector('input[name="clickExtra"]:checked')?.value||'';const click_extra=choice==='yes';const extra_button_name=$('buttonName').value.trim();
- $('start').disabled=true;$('copy').disabled=true;$('download').disabled=true;results=[];render();$('fill').style.width='8%';$('status').textContent=`Sending ${urls.length} profile(s) to the browser...`;
- try{const res=await fetch(`${API_BASE}/api/extract`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({urls,click_extra,extra_button_name})});if(!res.ok)throw new Error((await res.text()).slice(0,350));const data=await res.json();results=data.results||[];render();$('fill').style.width='100%';$('status').textContent=`Completed: ${data.total} profile(s) processed · ${data.found} with website or email found.`}
- catch(e){$('status').textContent='Extraction failed: '+e.message;$('fill').style.width='0%'}finally{$('start').disabled=false}};
-$('clear').onclick=()=>{$('urls').value='';$('buttonName').value='';document.querySelectorAll('input[name="clickExtra"]').forEach(x=>x.checked=false);results=[];render();$('status').textContent='Ready. Paste profile links to begin.';$('fill').style.width='0%'};
-$('copy').onclick=async()=>{try{await navigator.clipboard.writeText(tsv());$('status').textContent='Copied! Open Excel and paste into cell A1.'}catch(e){$('status').textContent='Clipboard blocked. Use Download CSV instead.'}};
-$('download').onclick=()=>{const rows=[['Website','Email','Status','Note','Profile URL'],...results.map(r=>[r.website,r.email,r.status,r.note,r.profile])];const csv=rows.map(row=>row.map(csvEscape).join(',')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='COMPAMED_company_data.csv';a.click();URL.revokeObjectURL(a.href)};
-</script></body></html>
+const $ = id => document.getElementById(id);
+let results = [];
+
+function getUniqueUrls(){
+    const lines = $('urls').value
+        .split(/\r?\n/)
+        .map(x => x.trim())
+        .filter(Boolean);
+
+    return [...new Set(lines)];
+}
+
+function escapeHtml(value){
+    return String(value ?? '').replace(/[&<>"']/g, ch => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;',
+        '"':'&quot;',"'":'&#39;'
+    })[ch]);
+}
+
+function render(){
+    $('total').textContent = results.length;
+
+    const found = results.filter(r => r.website || r.email).length;
+    $('found').textContent = found;
+    $('notFound').textContent = results.length - found;
+
+    $('rows').innerHTML = results.length
+        ? results.map(r => `
+            <tr>
+                <td>${r.website
+                    ? <a href="${escapeHtml(r.website)}" target="_blank" rel="noopener">${escapeHtml(r.website)}</a>
+                    : '—'}</td>
+                <td>${escapeHtml(r.email || '—')}</td>
+                <td class="${r.website || r.email ? 'status':'error'}">${escapeHtml(r.status)}</td>
+            </tr>
+        `).join('')
+        : '<tr><td colspan="3">No results yet.</td></tr>';
+
+    $('copy').disabled = results.length === 0;
+    $('download').disabled = results.length === 0;
+}
+
+function csvEscape(value){
+    return '"' + String(value ?? '').replace(/"/g, '""') + '"';
+}
+
+$('start').addEventListener('click', async () => {
+    const urls = getUniqueUrls();
+
+    if(!urls.length){
+        $('status').textContent = 'Please paste at least one profile link.';
+        return;
+    }
+
+    if(urls.length > 100){
+        $('status').textContent = 'Maximum 100 links per batch. Please split your links.';
+        return;
+    }
+
+    const selected = document.querySelector('input[name="clickExtra"]:checked');
+    const clickExtra = selected?.value === 'yes';
+    const buttonName = $('buttonName').value.trim();
+
+    $('start').disabled = true;
+    $('clear').disabled = true;
+    $('copy').disabled = true;
+    $('download').disabled = true;
+
+    results = [];
+    render();
+
+    $('progressBar').style.width = '15%';
+    $('status').textContent = Sending ${urls.length} profile links to the extractor...;
+
+    try{
+        const response = await fetch('/api/extract', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({
+                urls,
+                click_extra:clickExtra,
+                button_name:buttonName
+            })
+        });
+
+        const data = await response.json();
+
+        if(!response.ok){
+            throw new Error(data.detail || Server error: ${response.status});
+        }
+
+        results = data.results || [];
+        render();
+
+        $('progressBar').style.width = '100%';
+        $('status').textContent =
+            Completed: ${data.processed} profiles processed · ${data.found} with at least one detail found.;
+
+    }catch(error){
+        $('status').textContent = 'Extraction failed: ' + error.message;
+        $('progressBar').style.width = '0%';
+    }finally{
+        $('start').disabled = false;
+        $('clear').disabled = false;
+    }
+});
+
+$('clear').addEventListener('click', () => {
+    $('urls').value = '';
+    $('buttonName').value = '';
+    document.querySelectorAll('input[name="clickExtra"]').forEach(x => x.checked = false);
+
+    results = [];
+    render();
+
+    $('progressBar').style.width = '0%';
+    $('status').textContent = 'Ready. Paste profile links to begin.';
+});
+
+$('copy').addEventListener('click', async () => {
+    const lines = [
+        ['Website','Email'].join('\t'),
+        ...results.map(r => [r.website || '', r.email || ''].join('\t'))
+    ];
+
+    try{
+        await navigator.clipboard.writeText(lines.join('\n'));
+        $('status').textContent = 'Website and Email copied. Paste directly into Excel.';
+    }catch(error){
+        $('status').textContent = 'Clipboard permission denied. Use Download CSV instead.';
+    }
+});
+
+$('download').addEventListener('click', () => {
+    const lines = [
+        ['Website','Email','Status','Profile Link'].map(csvEscape).join(','),
+        ...results.map(r => [
+            r.website,r.email,r.status,r.profile
+        ].map(csvEscape).join(','))
+    ];
+
+    const blob = new Blob(
+        ['\uFEFF' + lines.join('\r\n')],
+        {type:'text/csv;charset=utf-8;'}
+    );
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'COMPAMED_Website_Email.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+});
+</script>
+</body>
+</html>
