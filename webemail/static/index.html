@@ -27,7 +27,7 @@ textarea{width:100%;height:255px;resize:vertical;background:#091323;border:1px s
 <p class="footer">Only values found in the visible Company Data/popup content are used. COMPAMED platform links and social links are excluded. Missing fields stay blank.</p></section></div>
 <p class="footer">COMPAMED Bulk Company Data Extractor · Hosted frontend + Render browser automation backend.</p></main>
 <script>
-const API_BASE='https://website-1-njye.onrender.com';const $=id=>document.getElementById(id);let results=[];
+const API_BASE='https://website-1-njye.onrender.com/api/extract';const $=id=>document.getElementById(id);let results=[];
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function csvEscape(v){return '"'+String(v??'').replace(/"/g,'""')+'"'}
 function tsv(){return ['Website\tEmail',...results.map(r=>(r.website||'')+'\t'+(r.email||''))].join('\r\n')}
