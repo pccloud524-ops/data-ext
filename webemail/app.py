@@ -12,8 +12,8 @@ from playwright.async_api import async_playwright, TimeoutError as PlaywrightTim
 app = FastAPI(title="COMPAMED Bulk Company Data Extractor")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://ornate-griffin-c7a0d6.netlify.app"],
-    allow_credentials=False,
+    allow_origins=["https://data-ext.onrender.com"],
+    allow_credentials=true,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
